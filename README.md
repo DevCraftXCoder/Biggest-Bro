@@ -1,8 +1,26 @@
 # Biggest Bro
 
-**AI chat agent for YouTubers and musicians. Strategy, content ideas, and audience growth — powered by Claude.**
+![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=flat&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Anthropic](https://img.shields.io/badge/Anthropic_Claude-D97706?style=flat&logo=anthropic&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=flat&logo=cloudflare&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-> An intelligent chat agent purpose-built for independent creators. Biggest Bro understands the YouTube and music industry ecosystem and gives specific, actionable advice — not generic tips. Ask about your next video concept, your release strategy, how to grow on a specific platform, or why your numbers are plateauing.
+**AI chat agent for YouTubers and musicians. Strategy, content ideas, and audience growth — powered by Claude Opus 4.7 with extended thinking.**
+
+> An intelligent chat agent purpose-built for independent creators. Biggest Bro has deep context about the YouTube algorithm and music industry ecosystem — ask about your next video concept, your release strategy, why your numbers are plateauing, or how to grow on a specific platform.
+
+---
+
+## Table of Contents
+
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Security](#security)
+- [Key Engineering Decisions](#key-engineering-decisions)
+- [API](#api)
+- [Running This](#running-this)
 
 ---
 
@@ -14,77 +32,105 @@ Browser
   ▼
 Next.js 15  (App Router)
   │
-  ├── Chat UI  (React — optimistic updates, streaming)
+  ├── Chat UI  (React — optimistic updates · streaming)
   │
   └── /api/chat  (Edge API route)
         │
-        └── Anthropic SDK  (claude-opus-4-7, extended thinking)
+        └── Anthropic SDK  (claude-opus-4-7 · extended thinking)
               │
-              ├── System prompt  (creator-domain expert persona)
-              ├── Conversation history  (managed client-side + server validation)
-              ├── Tool use  (content calendar, trend lookup, analytics summary)
-              └── Prompt cache  (system prompt + reference data, 5-min TTL)
+              ├── System prompt  (creator-domain expert persona · ~3,000 tokens)
+              ├── Conversation history  (client-managed · server-validated per turn)
+              ├── Tool use  (content calendar · title analyzer · release timing · growth plan)
+              └── Prompt cache  (system prompt + tool schemas · 5-min TTL)
 ```
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 15, App Router, React |
-| AI | Anthropic Claude API (Opus 4.7) |
-| Streaming | Server-Sent Events (SSE) via Anthropic SDK |
-| Edge Runtime | Cloudflare Workers / Next.js edge |
-| Caching | Anthropic prompt caching (system prompt + tool schemas) |
-| Validation | Zod |
+| Layer | Technology | Notes |
+|---|---|---|
+| Frontend | Next.js 15, App Router, React | Optimistic UI updates |
+| AI | Anthropic Claude API (`claude-opus-4-7`) | Extended thinking, 8k token budget |
+| Streaming | Server-Sent Events via Anthropic SDK | Progressive token delivery |
+| Runtime | Cloudflare Workers / Next.js edge | Zero cold starts |
+| Caching | Anthropic prompt caching | System prompt + tool schemas, 5-min TTL |
+| Validation | Zod | Conversation history + tool input validation |
 
 ---
 
 ## Features
 
 ### Creator-Domain Intelligence
+
 Biggest Bro has deep context about:
 - YouTube algorithm signals (CTR, AVD, re-watch rate, click-through patterns)
 - Music release strategy (timing, platform sequencing, pre-save campaigns)
 - Audience growth levers specific to each platform
 - Content formats that perform in niche communities
-- Common mistakes indie creators make with their content strategy
+- Common mistakes indie creators make with content strategy
 
 ### Tools (Function Calling)
-Biggest Bro can use tools mid-conversation:
 
 | Tool | Purpose |
 |---|---|
-| `generate_content_calendar` | Creates a 30-day content plan based on your niche and goals |
+| `generate_content_calendar` | 30-day content plan based on niche and goals |
 | `analyze_title` | Scores a YouTube title for CTR potential with suggestions |
-| `compare_release_windows` | Evaluates release timing for music drops by day/season |
-| `audience_growth_plan` | Generates a platform-specific growth roadmap |
+| `compare_release_windows` | Evaluates release timing by day/season |
+| `audience_growth_plan` | Platform-specific growth roadmap |
+
+Tool outputs are rendered as structured UI components in the chat — not raw JSON. The AI narrative references the tool output naturally.
 
 ### Conversation Management
 - Full conversation history maintained client-side
-- Server-side validation prevents history tampering
+- Server-side validation prevents history tampering on every turn (role sequence, length limits, content bounds)
 - System prompt cached at Anthropic — consistent persona, lower latency on every turn
-- Extended thinking enabled for complex strategy questions
+- Extended thinking enabled for complex multi-step strategy questions
+
+---
+
+## Security
+
+### API Credential Protection
+- Anthropic API credentials stored server-side as environment variables — never included in client bundles or accessible from the browser.
+- Edge runtime API route — credentials exist only in the Cloudflare Workers execution context.
+
+### Conversation History Validation
+- Conversation history is validated server-side on every request — role sequence checked, length capped, content bounds enforced.
+- A client cannot inject system-role messages or manipulate prior AI responses in the history.
+- History tampering returns a `400` before any Claude API call is made.
+
+### Prompt Injection Prevention
+- User messages are passed in the `user` role only — never interpolated into the system prompt.
+- Tool inputs validated with Zod before execution.
+- No external API calls from tools without explicit user-facing confirmation.
+
+### Rate Limiting
+- API route rate-limited per user session — prevents abuse and runaway token consumption.
+- Token budget enforcement: extended thinking budget capped at 8,000 tokens per turn.
+
+### No Persistent Data
+- No conversation history stored server-side — each session is ephemeral.
+- No user data transmitted beyond the explicit conversation context.
 
 ---
 
 ## Key Engineering Decisions
 
 ### Claude Opus 4.7 with extended thinking
-Creator strategy questions often require multi-step reasoning — "why is my channel plateauing?" involves understanding algorithm signals, content patterns, upload frequency, and audience behavior simultaneously. Extended thinking produces more coherent, well-reasoned strategic advice than a fast-path response.
+Creator strategy questions require multi-step reasoning — "why is my channel plateauing?" involves understanding algorithm signals, content patterns, upload frequency, and audience behavior simultaneously. Extended thinking produces more coherent, well-reasoned strategic advice than a fast-path response.
 
 ### Prompt caching for the system prompt
-The system prompt (domain expert context, creator taxonomy, platform behavior patterns) is ~3,000 tokens. Caching it saves ~$0.03 per conversation turn at scale and reduces first-token latency from ~800ms to ~200ms.
+The system prompt (domain expert context, creator taxonomy, platform behavior patterns) is ~3,000 tokens. Caching it saves approximately $0.03 per conversation turn at scale and reduces first-token latency from ~800ms to ~200ms on cache hits.
 
 ### SSE streaming for conversational feel
-Tokens stream progressively via Server-Sent Events. This is critical for long-form strategy responses — a 1,200-token response that streams feels fast and readable; the same response appearing all at once feels slow and overwhelming.
+Tokens stream progressively via Server-Sent Events. Long-form strategy responses (1,200+ tokens) that stream feel fast and readable; the same content appearing all at once feels slow.
 
 ### Optimistic UI updates
-Chat messages are added to the UI immediately on submit (before the API call returns). If the call fails, the message is rolled back with an error state. This eliminates the perceptible delay between send and display.
+Chat messages appear in the UI immediately on submit — before the API call returns. If the call fails, the message rolls back with an error state. This eliminates perceptible delay between send and display.
 
-### Tool results injected as context, not shown raw
-Tool outputs (e.g., content calendar JSON) are rendered as structured UI components in the chat, not as raw JSON. The AI response references the tool output narratively. This gives the user actionable artifacts without exposing implementation details.
+### Tool results as structured UI components
+Tool outputs (content calendar JSON, title score, etc.) are rendered as structured React components in the chat, not raw JSON blocks. The AI response references the tool output narratively — users get actionable artifacts without implementation details cluttering the conversation.
 
 ---
 
@@ -106,13 +152,17 @@ Response: `text/event-stream` — streamed token deltas.
 
 ---
 
-## Security
+## Running This
 
-- API route rate-limited per user session — prevents abuse
-- Conversation history validated server-side (role sequence, length limits) — prevents prompt injection via history manipulation
-- No user-generated content embedded directly into system prompt
-- Tool inputs validated with Zod before execution
-- No external API calls in tools without user-visible confirmation
+```bash
+npm install
+
+npm run dev        # dev server
+npm run build      # production build
+npm run typecheck  # tsc --noEmit
+```
+
+See `.env.example` for required environment variables (`ANTHROPIC_API_KEY`).
 
 ---
 
