@@ -6,9 +6,9 @@
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=flat&logo=cloudflare&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-**AI chat agent for YouTubers and musicians. Strategy, content ideas, and audience growth — powered by Claude Opus 4.7 with extended thinking.**
+**Domain-expert AI agent for independent creators. Content strategy, audience growth, and platform optimization — powered by Claude Opus 4.7 with extended thinking and function calling.**
 
-> An intelligent chat agent purpose-built for independent creators. Biggest Bro has deep context about the YouTube algorithm and music industry ecosystem — ask about your next video concept, your release strategy, why your numbers are plateauing, or how to grow on a specific platform.
+> A production AI agent that goes beyond generic chat. Built with deep context about platform algorithms, content ecosystems, and creator growth patterns — backed by Claude extended thinking for multi-step strategy questions that need real reasoning, not quick answers.
 
 ---
 
@@ -65,10 +65,10 @@ Next.js 15  (App Router)
 
 Biggest Bro has deep context about:
 - YouTube algorithm signals (CTR, AVD, re-watch rate, click-through patterns)
-- Music release strategy (timing, platform sequencing, pre-save campaigns)
+- Platform release strategy (timing, sequencing, pre-release campaigns)
 - Audience growth levers specific to each platform
 - Content formats that perform in niche communities
-- Common mistakes indie creators make with content strategy
+- Common mistakes independent creators make with content strategy
 
 ### Tools (Function Calling)
 
