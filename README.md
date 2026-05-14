@@ -2,25 +2,13 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=flat&logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
-![Anthropic](https://img.shields.io/badge/Anthropic_Claude-D97706?style=flat&logo=anthropic&logoColor=white)
+![AI Powered](https://img.shields.io/badge/AI_Powered-D97706?style=flat&logo=anthropic&logoColor=white)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=flat&logo=cloudflare&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-**Domain-expert AI agent for independent creators. Content strategy, audience growth, and platform optimization — powered by Claude Opus 4.7 with extended thinking and function calling.**
+**Domain-expert AI agent for independent creators. Content strategy, audience growth, and platform optimization — powered by LLM extended thinking and function calling.**
 
-> A production AI agent that goes beyond generic chat. Built with deep context about platform algorithms, content ecosystems, and creator growth patterns — backed by Claude extended thinking for multi-step strategy questions that need real reasoning, not quick answers.
-
----
-
-## Table of Contents
-
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Security](#security)
-- [Key Engineering Decisions](#key-engineering-decisions)
-- [API](#api)
-- [Running This](#running-this)
+> A production AI agent that goes beyond generic chat. Built with deep context about platform algorithms, content ecosystems, and creator growth patterns — backed by LLM extended thinking for multi-step strategy questions that need real reasoning, not quick answers.
 
 ---
 
@@ -36,7 +24,7 @@ Next.js 15  (App Router)
   │
   └── /api/chat  (Edge API route)
         │
-        └── Anthropic SDK  (claude-opus-4-7 · extended thinking)
+        └── AI SDK  (LLM · extended thinking)
               │
               ├── System prompt  (creator-domain expert persona · ~3,000 tokens)
               ├── Conversation history  (client-managed · server-validated per turn)
@@ -51,10 +39,10 @@ Next.js 15  (App Router)
 | Layer | Technology | Notes |
 |---|---|---|
 | Frontend | Next.js 15, App Router, React | Optimistic UI updates |
-| AI | Anthropic Claude API (`claude-opus-4-7`) | Extended thinking, 8k token budget |
-| Streaming | Server-Sent Events via Anthropic SDK | Progressive token delivery |
+| AI | LLM API (Opus) | Extended thinking, 8k token budget |
+| Streaming | Server-Sent Events via AI SDK | Progressive token delivery |
 | Runtime | Cloudflare Workers / Next.js edge | Zero cold starts |
-| Caching | Anthropic prompt caching | System prompt + tool schemas, 5-min TTL |
+| Caching | LLM prompt caching | System prompt + tool schemas, 5-min TTL |
 | Validation | Zod | Conversation history + tool input validation |
 
 ---
@@ -84,7 +72,7 @@ Tool outputs are rendered as structured UI components in the chat — not raw JS
 ### Conversation Management
 - Full conversation history maintained client-side
 - Server-side validation prevents history tampering on every turn (role sequence, length limits, content bounds)
-- System prompt cached at Anthropic — consistent persona, lower latency on every turn
+- System prompt cached at the AI provider — consistent persona, lower latency on every turn
 - Extended thinking enabled for complex multi-step strategy questions
 
 ---
@@ -92,13 +80,13 @@ Tool outputs are rendered as structured UI components in the chat — not raw JS
 ## Security
 
 ### API Credential Protection
-- Anthropic API credentials stored server-side as environment variables — never included in client bundles or accessible from the browser.
+- AI credentials stored server-side as environment variables — never included in client bundles or accessible from the browser.
 - Edge runtime API route — credentials exist only in the Cloudflare Workers execution context.
 
 ### Conversation History Validation
 - Conversation history is validated server-side on every request — role sequence checked, length capped, content bounds enforced.
 - A client cannot inject system-role messages or manipulate prior AI responses in the history.
-- History tampering returns a `400` before any Claude API call is made.
+- History tampering returns a `400` before any API call is made.
 
 ### Prompt Injection Prevention
 - User messages are passed in the `user` role only — never interpolated into the system prompt.
@@ -117,7 +105,7 @@ Tool outputs are rendered as structured UI components in the chat — not raw JS
 
 ## Key Engineering Decisions
 
-### Claude Opus 4.7 with extended thinking
+### LLM with extended thinking
 Creator strategy questions require multi-step reasoning — "why is my channel plateauing?" involves understanding algorithm signals, content patterns, upload frequency, and audience behavior simultaneously. Extended thinking produces more coherent, well-reasoned strategic advice than a fast-path response.
 
 ### Prompt caching for the system prompt
@@ -152,20 +140,10 @@ Response: `text/event-stream` — streamed token deltas.
 
 ---
 
-## Running This
-
-```bash
-npm install
-
-npm run dev        # dev server
-npm run build      # production build
-npm run typecheck  # tsc --noEmit
-```
-
-See `.env.example` for required environment variables (`ANTHROPIC_API_KEY`).
-
----
-
 ## License
 
 MIT — see [LICENSE](LICENSE)
+
+---
+
+*Built by Frxncois — not open source.*
