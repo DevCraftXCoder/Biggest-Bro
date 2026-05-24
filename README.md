@@ -6,7 +6,7 @@
 
 **LLM co-pilot for independent creators — LLM extended thinking, tool use, domain expertise.**
 
-> Domain-expert AI assistant for YouTubers, musicians, and independent creators. Uses LLM extended thinking with an 8,000-token budget and tool use to reason through creator-specific strategy — content calendars, trend analysis, monetization paths, audience growth.
+> Domain-expert automation assistant for YouTubers, musicians, and independent creators. Uses LLM extended thinking with an 8,000-token budget and tool use to reason through creator-specific strategy — content calendars, trend analysis, monetization paths, audience growth.
 
 ## Architecture
 
@@ -24,12 +24,12 @@ React Chat UI
 | Layer | Technology |
 |-------|-----------|
 | Framework | Next.js 15 (App Router, edge runtime) |
-| AI | LLM (Opus tier) with extended thinking (8,000-token budget) |
+| LLM | LLM (Opus tier) with extended thinking (8,000-token budget) |
 | Prompt caching | 5-min TTL on system prompt + creator expertise persona |
 | Tool use | Content calendar generation, trend analysis, analytics summary |
 | Language | TypeScript |
 
-## How the AI Works
+## How It Works
 
 - **Model: LLM (Opus tier)** with extended thinking — reasons through multi-step creator decisions before responding
 - **Thinking budget: 8,000 tokens** — allows deep analysis of content strategy, monetization, and growth
