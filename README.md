@@ -4,7 +4,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
 ![LLM Powered](https://img.shields.io/badge/LLM_Powered-D97706?style=flat&logo=anthropic&logoColor=white)
 
-**AI co-pilot for independent creators — LLM extended thinking, tool use, domain expertise.**
+**LLM co-pilot for independent creators — LLM extended thinking, tool use, domain expertise.**
 
 > Domain-expert AI assistant for YouTubers, musicians, and independent creators. Uses LLM extended thinking with an 8,000-token budget and tool use to reason through creator-specific strategy — content calendars, trend analysis, monetization paths, audience growth.
 
